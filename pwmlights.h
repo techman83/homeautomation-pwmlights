@@ -4,10 +4,20 @@
 #include <cstdlib>
 #include <stdint.h>
 
+#ifdef ESP8266
+  #include <functional>
+  #define CALLBACK_SIGNATURE std::function<void(const char*, int)> callback
+#else
+  #define CALLBACK_SIGNATURE void (*callback)(const char*, int)
+#endif
+
 class pwmlights {
 private:
+  CALLBACK_SIGNATURE;
+  const char* topic;
   uint8_t pwm_pin;
   uint8_t sw_pin;
+  uint8_t relay_pin;
   int brightness = 900;
   int fadeAmount = 20;
   int dimDelay = 100;
@@ -18,7 +28,9 @@ private:
 public:
   pwmlights();
   pwmlights& setPwmPin(const uint8_t pwm_pin);
-  pwmlights& setSwPin(const uint8_t pwm_pin);
+  pwmlights& setSwPin(const uint8_t sw_pin);
+  pwmlights& setRelayPin(const uint8_t relay_pin);
+  pwmlights& setCallback(CALLBACK_SIGNATURE, const char* topic);
   void Setup();
   void Loop();
 };
